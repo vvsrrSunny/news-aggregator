@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NewsAggregatorController;
+use App\Http\Controllers\NewsItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('news', [NewsAggregatorController::class, 'index'])
     ->name('news.index');
+
+Route::get('news/{id}/profile', [NewsItemController::class, 'index'])
+    ->where('id', '[\w\-\._\/]+') // Only allow alphanumeric characters, dashes, dots, and percent signs
+    ->name('news.profile.index');
