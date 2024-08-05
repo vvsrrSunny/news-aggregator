@@ -34,7 +34,7 @@ const News: React.FC = () => {
         setError(null);
 
         try {
-            const response = await axios.get(`http://localhost:8000/api/news/?search=${searchQuery}`);
+            const response = await axios.get(`http://localhost:8000/news/?search=${searchQuery}`);
             setResults(response.data.theGuardian);
             console.log( results);
         } catch (err: any) {

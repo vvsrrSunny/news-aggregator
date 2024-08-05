@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\NewsItemService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cookie;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class NewsItemController extends Controller
@@ -28,7 +28,7 @@ class NewsItemController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function pin(string $id): JsonResponse
+    public function post(Request $request, string $id): JsonResponse
     {
         $article = NewsItemService::getGuardianNewsItem($id);
 
@@ -36,25 +36,26 @@ class NewsItemController extends Controller
             return  response()->json(['errors' => ["id" => "id not found to pin"]], 422);
         }
 
-        // Check if the pinned_articles cookie exists
-        if (!Cookie::has('pinned_articles')) {
-            $cookie = cookie('pinned_articles', json_encode(['the_guardian' => [$id]]), 60 * 24 * 30);
-            Log::debug(['cookie_value' => json_decode($cookie->getValue(), true)]);
-            return response()->json(['data' => "success"])->cookie($cookie);
-        }
-        // Retrieve the existing cookie data
-        $cookieData = json_decode(Cookie::get('pinned_articles'), true);
-
-        if (is_null($cookieData)) {
-            $cookieData = ['the_guardian' => []];
+        if (!$request->session()->get('pinned_articles', null)) {
+            $pinnedArticles = ['the_guardian' => [$id]];
+            $request->session()->put('pinned_articles', $pinnedArticles);
+            Log::debug(['session_value' => $request->session()->get('pinned_articles')]);
+            return response()->json(['data' => "success"]);
         }
 
-        $cookieData['the_guardian'][] = $id;
+        // Retrieve the existing session data
+        $pinnedArticles = $request->session()->get('pinned_articles');
 
-        // Create a new cookie with the updated data
-        $newCookie = cookie('pinned_articles', json_encode($cookieData), 60 * 24 * 30);
-        Log::debug(['cookie_value' => $cookieData]);
+        if (is_null($pinnedArticles)) {
+            $pinnedArticles = ['the_guardian' => []];
+        }
 
-        return response()->json(['data' => "success"])->cookie($newCookie);
+        $pinnedArticles['the_guardian'][] = $id;
+
+        // Save the updated session data
+        $request->session()->put('pinned_articles', $pinnedArticles);
+        Log::debug(['session_value' => $pinnedArticles]);
+
+        return response()->json(['data' => "success"]);
     }
 }

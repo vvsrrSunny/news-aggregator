@@ -22,21 +22,21 @@ class NewsAggregatorController extends Controller
         $extractedArticles = TheGuardianService::getGuardianNews($request);
 
         // Check if the pinned_articles cookie exists
-        if (!Cookie::has('pinned_articles')) {
+        if (!$request->session()->get('pinned_articles', null)) {
             return response()->json(['theGuardian' => $extractedArticles]);
         }
 
         // Retrieve the existing cookie data
-        $cookieData = json_decode(Cookie::get('pinned_articles'), true);
+        $sessionData = $request->session()->get('pinned_articles');
 
-        if (is_null($cookieData)) {
+        if (is_null($sessionData)) {
             return response()->json(['theGuardian' => $extractedArticles]);
         }
 
-        $extractedArticles = collect($extractedArticles)->map(function (array $item, int $key) use ($cookieData) {
-            Log::debug($item['id'], $cookieData['the_guardian']);
+        $extractedArticles = collect($extractedArticles)->map(function (array $item, int $key) use ($sessionData) {
+            Log::debug($item['id'], $sessionData['the_guardian']);
 
-            if (!collect($cookieData['the_guardian'])->contains($item['id'])) {
+            if (!collect($sessionData['the_guardian'])->contains($item['id'])) {
                 $item['isPinned'] = false;
                 return $item;
             }
