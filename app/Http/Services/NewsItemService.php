@@ -6,7 +6,7 @@ use App\Http\Requests\NewsSearchRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
-class TheGuardianArticleService
+class NewsItemService
 {
     public static function getGuardianNewsItem(string $id)
     {

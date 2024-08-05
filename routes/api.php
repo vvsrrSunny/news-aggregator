@@ -26,3 +26,7 @@ Route::get('news', [NewsAggregatorController::class, 'index'])
 Route::get('news/{id}/profile', [NewsItemController::class, 'index'])
     ->where('id', '[\w\-\._\/]+') // Only allow alphanumeric characters, dashes, dots, and percent signs
     ->name('news.profile.index');
+
+Route::get('news/{id}/pin', [NewsItemController::class, 'pin'])
+    ->where('id', '[\w\-\._\/]+') // Only allow alphanumeric characters, dashes, dots, and percent signs
+    ->name('news.profile.pin');

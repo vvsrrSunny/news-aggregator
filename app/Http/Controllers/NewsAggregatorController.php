@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NewsAggregatorRequest;
 use App\Http\Services\TheGuardianService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NewsAggregatorController extends Controller
@@ -14,7 +15,7 @@ class NewsAggregatorController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(NewsAggregatorRequest $request)
+    public function index(NewsAggregatorRequest $request): JsonResponse
     {
         $extractedArticles = TheGuardianService::getGuardianNews($request);
 
